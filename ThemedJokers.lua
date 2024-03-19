@@ -14,7 +14,7 @@ local localization = {
             "Played {C:attention}Aces{} in",
 			"scored hand",
 			"add {C:chips}+#1#{} Chips",
-			"{C:inactive}(---)"
+			"{C:inactive}(Even a lowly soldier matters.)"
         }
     },
 	    combatacepromotion = {
@@ -23,7 +23,7 @@ local localization = {
 			"Played {C:attention}Aces{} have a",
 			"{C:green}#1# in #2#{} chance to",
 			"become a random edition",
-			"{C:inactive}(---)"
+			"{C:inactive}(Time for a promotion!)"
         }
     },
     combatacerecruiter = {
@@ -32,7 +32,7 @@ local localization = {
             "Discarded cards have",
 			"{C:green}#1# in #2#{} chance to",
 			"become an {C:attention}Ace{}",
-			"{C:inactive}(---)"
+			"{C:inactive}(Are you interested in joining the ACES?)"
         }
     },
     combatacegeneral = {
@@ -41,7 +41,7 @@ local localization = {
             "{C:attention}\"Combat Ace Jokers\"{}",
             "each give {X:mult,C:white} X#1# {} Mult",
 			"Also counts itself",
-			"{C:inactive}(---)"
+			"{C:inactive}(Aces = Power!)"
         }
     },
 }
@@ -81,7 +81,7 @@ local jokerBlacklists = {
 }
 
 function SMODS.INIT.ThemedJokers() 
-    init_localization()
+init_localization()
 
 
 	for k, v in pairs(jokers) do
@@ -94,11 +94,7 @@ function SMODS.INIT.ThemedJokers()
         end
     end
 
-    --- Joker abilities ---
-	
-	
-	
-	
+    --- Joker abilities ---	
 	---Combat Ace General:---
     SMODS.Jokers.j_combatacegeneral.calculate = function(self, context)
         if context.other_joker and context.other_joker then
@@ -127,10 +123,10 @@ function SMODS.INIT.ThemedJokers()
 					if card:get_id() ~= 14 then return nil end
 					return {
 					 message = localize{type='variable',key='a_chips',vars={self.ability.extra.chips}},
-                      chips = self.ability.extra.chips,
+                      chips_mod = self.ability.extra.chips,
                       card = self
                     }
-				end
+				    end
 				end				
             end
         end
