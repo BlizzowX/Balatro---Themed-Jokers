@@ -6,7 +6,7 @@ Jokerpack 1 includes:
 Combat Aces - Jokers centered around ACES.
 
 Combat Ace - Soldier:
-Played Aces in scored hand add +35 Chips
+Scored Aces add 35 chips.
 
 Combat Ace - Promotion:
 Played Aces have a 1 in 6 chance to become a random Edition
@@ -16,3 +16,10 @@ Combat Ace - General:
 
 Combat Ace - Recruiter
 Discarded cards have a 1 in 8 chance to become an Ace
+
+Combat Ace - Mercenary:
+Scored Aces add x1.5 Mult. You have to pay $5 at the end of each round, or this Joker is destroyed
+
+Combat Ace - Veteran:
+Scored Aces repeat and add 50 chips. Adds +10 Chips to that effect at the end of each round.
+This is a legendary, but I added an alternative way to get this joker.
