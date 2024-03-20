@@ -171,7 +171,7 @@ init_localization()
         end
         if context.end_of_round and not (context.individual or context.repetition) then
             self.ability.extra.counter=self.ability.extra.counter+1
-            if self.ability.extra.counter>=2 then
+            if self.ability.extra.counter>=15 then
                 local edition = self:get_edition()
                 destroyCard(self,'holo1')
                 local card = create_card('Joker', G.jokers, nil, 0, nil, nil, 'j_combataceveteran', nil)
@@ -199,12 +199,12 @@ init_localization()
         end
         
         if context.repetition and context.cardarea == G.Play and (context.other_card:get_id() == 14) then            
-                return {
-                    message = localize('k_again_ex'),
-                    repetitions = self.ability.extra,
-                    card = self
-                }
-            end
+            return {
+                message = localize('k_again_ex'),
+                repetitions = self.ability.extra,
+                card = self
+            }
+        end
 
         if context.end_of_round and not (context.individual or context.repetition) then
             self.ability.extra.counter=self.ability.extra.counter+1
