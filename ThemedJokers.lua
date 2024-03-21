@@ -28,6 +28,15 @@ function destroyCard(self,sound)
     self.gone = true
 end
 
+function shakecard(self)
+    G.E_MANAGER:add_event(Event({
+        func = function()
+            self:juice_up(0.5, 0.5)
+            return true
+        end
+    }))
+end
+
 
 
 
@@ -38,6 +47,24 @@ local localization = {
             "Each scored {C:attention}Ace{}",			
 			"adds {C:chips}+#1#{} Chips",
 			"{C:inactive}(Being a soldier is hard. Survived #2# rounds.)"
+        }
+    },
+    combatacesecretagent = {
+        name = "Combat Ace - Secret Agent",
+        text = {
+            "Copies the effect of the {C:attention}Combat Ace{}",			
+			"to it's right.",
+            "{C:green}#1#{}",
+            "{C:inactive}(An enigma of the ACES)",
+        }
+    },
+    combatacesupplies = {
+        name = "Combat Ace - Supplies",
+        text = {
+            "For every {C:red}3 discarded{} ",			
+			"{C:attention}Aces{} get {C:yellow}#1#${}. This bonus ",
+            "increases by {C:yellow}$1{} every time it activates",
+			"{C:inactive}(Sustain is important! Next supply drop in: #2#)"
         }
     },
     combatacemercenary = {
@@ -61,7 +88,7 @@ local localization = {
     combatacerecruiter = {
         name = "Combat Ace - Recruiter",
         text = {
-            "Discarded cards have a",
+            " {C:red}Discarded cards{} have a",
 			"{C:green}#1# in #2#{} chance to",
 			"become an {C:attention}Ace{}",
 			"{C:inactive}(Are you interested in joining the ACES?)"
@@ -94,6 +121,12 @@ local jokers = {
         {}, "",
         1, 4, true, true, true, true
     ),
+    combatacesupplies = SMODS.Joker:new(
+        "Combat Ace - Supplies", "",
+		{extra={dollars=3, counter=3}},
+        {}, "",
+        1, 4, true, true, true, true
+    ),
 	combatacepromotion = SMODS.Joker:new(
         "Combat Ace - Promotion", "",
         {extra={odds = 6}},
@@ -104,7 +137,7 @@ local jokers = {
         "Combat Ace - Recruiter", "",
         {extra={odds = 8}},
         {}, "",
-        3, 12, true, true, false, true
+        2, 8, true, true, false, true
     ),
     combatacegeneral = SMODS.Joker:new(
         "Combat Ace - General", "",
@@ -116,13 +149,19 @@ local jokers = {
         "Combat Ace - Mercenary", "",
         {extra={x_mult = 1.5}},
         {}, "",
-        1, 5, true, true, true, true
+        1, 4, true, true, true, true
     ),
     combataceveteran = SMODS.Joker:new(
         "Combat Ace - Veteran", "",
 		{extra={chips=50, counter=0, bonustotal=50}},
         {}, "",
         4, 45, true, true, true, true
+    ),
+    combatacesecretagent = SMODS.Joker:new(
+        "Combat Ace - Secret Agent", "",
+        {extra={name = ""}},
+        {}, "",
+        2, 8, true, true, true, true
     ),
 }
 
@@ -143,12 +182,7 @@ init_localization()
     SMODS.Jokers.j_combatacegeneral.calculate = function(self, context)
         if context.other_joker then
             if string.match(context.other_joker.ability.name, "Combat Ace") then
-                G.E_MANAGER:add_event(Event({
-                    func = function()
-                        context.other_joker:juice_up(0.5, 0.5)
-                        return true
-                    end
-                })) 
+                shakecard(context.other_joker)
                 return {
                     message = localize{type='variable',key='a_xmult',vars={self.ability.extra.x_mult}},
                     Xmult_mod = self.ability.extra.x_mult
@@ -166,16 +200,12 @@ init_localization()
             card = self
             }
         end
-        if context.setting_blind then
-            
-        end
-        if context.end_of_round and not (context.individual or context.repetition) then
+        if context.end_of_round and not (context.individual or context.repetition) and not context.blueprint then
             self.ability.extra.counter=self.ability.extra.counter+1
             if self.ability.extra.counter>=15 then
-                local edition = self:get_edition()
                 destroyCard(self,'holo1')
                 local card = create_card('Joker', G.jokers, nil, 0, nil, nil, 'j_combataceveteran', nil)
-                card.set_edition=edition
+                card:set_edition({negative = true})
                 card:add_to_deck()
                 G.jokers:emplace(card)
                 card:start_materialize()
@@ -198,11 +228,11 @@ init_localization()
             }
         end
         
-        if context.repetition and context.cardarea == G.Play and (context.other_card:get_id() == 14) then            
+        if  context.repetition and context.cardarea == G.play and (context.other_card:get_id() == 14) then            
             return {
                 message = localize('k_again_ex'),
-                repetitions = self.ability.extra,
-                card = self
+                repetitions = 1,
+                card = context.other_card
             }
         end
 
@@ -220,25 +250,24 @@ init_localization()
 
 	---Combat Ace Promotion:---
     SMODS.Jokers.j_combatacepromotion.calculate = function(self, context)
-	if self.ability.set == "Joker" and not self.debuff then	
-		if context.individual then
-            if context.cardarea == G.play then	
-				for i = 1, #context.scoring_hand do
-					local card=context.scoring_hand[i]
-					if pseudorandom('promotion') < G.GAME.probabilities.normal / self.ability.extra.odds and card:get_id()==14 then						
-						if card:get_edition() ~= nil then return nil end
-						local edition = poll_edition('promotion', nil, true, true)				
-						return {
-							message = localize('k_promotion'),
-							colour = G.C.RED,
-							card = self
-						}   
-						end			
-					end
-				end
-			end
-		end
-	end
+        if context.individual and context.cardarea == G.play and context.other_card:get_id()==14 then		
+			local card=context.other_card
+			if pseudorandom('promotion') < G.GAME.probabilities.normal / self.ability.extra.odds then						
+				if card:get_edition() ~= nil then return nil end
+				local edition = poll_edition('promotion', nil, true, true)
+                shakecard(card)
+                card:set_edition(edition)
+                return {
+                    message = localize('k_agedup'),
+                    colour = G.C.CHIPS,
+                    card = card
+                }       
+				
+            end
+        end
+    end		
+					
+				
 	
     	---Combat Ace Mercenary:---
     SMODS.Jokers.j_combatacemercenary.calculate = function(self, context)
@@ -250,6 +279,7 @@ init_localization()
             }
         end
         if context.end_of_round and not (context.individual or context.repetition) then
+            shakecard(self)
             if G.GAME.dollars>5 then
                 ease_dollars(-5)
                 return {
@@ -257,9 +287,9 @@ init_localization()
                     colour = G.C.RED,
                     card = self
                 } 
-            else
-               destroyCard(self,'glass5')
-               return {
+            else                
+                destroyCard(self,'glass5')
+                return {
                 message = localize('k_mercenary_destroy'),
                 colour = G.C.RED,
                 card = self
@@ -270,22 +300,63 @@ init_localization()
     
                             
 
+    ---Combat Ace Supplies:---
+    SMODS.Jokers.j_combatacesupplies.calculate = function(self, context)
+        if context.discard and not context.other_card.debuff and context.other_card:get_id()==14 then        
+            local card=context.other_card
+            shakecard(self)
+            self.ability.extra.counter=self.ability.extra.counter-1            
+            if self.ability.extra.counter==0 then
+                self.ability.extra.counter=3
+                ease_dollars(self.ability.extra.dollars)
+                self.ability.extra.dollars=self.ability.extra.dollars+1
+                return {
+                    message = localize('k_supplydrop'),
+                    card = card,
+                    colour = G.C.YELLOW
+                }          
+            else
+            return {
+                message = localize('k_supplies_up'),
+                card = card,
+                colour = G.C.YELLOW
+            }
+            end
+        end
+    end
 
+
+    ---Combat Ace Secret Agent:---
+    SMODS.Jokers.j_combatacesecretagent.calculate = function(self, context)
+        if self.ability.set == "Joker" and not self.debuff then
+            local other_joker = nil
+            for i = 1, #G.jokers.cards do
+                if G.jokers.cards[i] == self then other_joker = G.jokers.cards[i+1] end
+            end
+            if other_joker and other_joker ~= self and string.match(other_joker.ability.name, "Combat Ace") then
+                self.ability.extra.name= other_joker.ability.name
+                context.blueprint = (context.blueprint and (context.blueprint + 1)) or 1
+                context.blueprint_card = context.blueprint_card or self
+                if context.blueprint > #G.jokers.cards + 1 then return end
+                local other_joker_ret = other_joker:calculate_joker(context)
+                if other_joker_ret then 
+                    other_joker_ret.card = context.blueprint_card or self
+                    other_joker_ret.colour = G.C.BLUE
+                    return other_joker_ret
+                end
+            end
+        end
+    end  
 
 	---Combat Ace Recruiter:---
     SMODS.Jokers.j_combatacerecruiter.calculate = function(self, context)
         if context.discard and not context.other_card.debuff and
-        pseudorandom('recruiter') < G.GAME.probabilities.normal/self.ability.extra.odds then
+        pseudorandom('recruiter') < G.GAME.probabilities.normal/self.ability.extra.odds and
+        context.other_card:get_id() ~= 14 then
             local card=context.other_card
             local suit_prefix = string.sub(card.base.suit, 1, 1)..'_'
-			local rank_suffix='A'
-			if card:get_id() == 14 then return nil end
-            G.E_MANAGER:add_event(Event({
-                func = function()
-                    card:juice_up(0.5, 0.5)
-                    return true
-                end
-            }))
+			local rank_suffix='A'			
+            shakecard(self)
             card:set_base(G.P_CARDS[suit_prefix..rank_suffix])
             return {
                 message = localize('k_recruit'),
@@ -297,8 +368,13 @@ init_localization()
     end
 
 
+
+
+
 	---localization texts:---
     G.localization.misc.dictionary.k_agedup = "Aged up!"
+    G.localization.misc.dictionary.k_supplies_up = "+ Supplies!"
+    G.localization.misc.dictionary.k_supplydrop = "Supply drop!"
     G.localization.misc.dictionary.k_recruit = "Recruited!"
 	G.localization.misc.dictionary.k_promotion = "Promoted!"
     G.localization.misc.dictionary.k_mercenary_pay = "Payday!"
@@ -344,9 +420,13 @@ function Card.generate_UIBox_ability_table(self)
             elseif self.ability.name == 'Combat Ace - Soldier' then
                 loc_vars = {self.ability.extra.chips, self.ability.extra.counter}
 
+            elseif self.ability.name == 'Combat Ace - Supplies' then
+                loc_vars = {self.ability.extra.dollars, self.ability.extra.counter}
+
             elseif self.ability.name == 'Combat Ace - Veteran' then
                 loc_vars = {self.ability.extra.chips, self.ability.extra.counter, self.ability.extra.bonustotal}
-
+            elseif self.ability.name == 'Combat Ace - Secret Agent' then
+                loc_vars = {self.ability.extra.name}
             end
         end
 
