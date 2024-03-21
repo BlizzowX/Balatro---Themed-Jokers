@@ -1,26 +1,36 @@
-Themed Jokers by Blizzow
-
-Adds different jokers to the game that hopefully synergize together.
-
-Jokerpack 1 includes:
-Combat Aces - Jokers centered around ACES.
-
+Blizzow's Themed Jokers
+Jokers that may or may not synergize together
+==============================================================================
+Current Version: 0.3
+Currently adds 8 Jokers (1 Theme: 3 Common ,3 Uncommon, 1 Rare and 1 Legendary)
+Currently adds 0 Decks (Might add a deck for every theme at a later point)
+==============================================================================
+How to install:
+Download the latest version of this mod
+Simply download the zip file and extract it to %appdata%\balatro\mods
+*Steamodded is required to use this mod
+==============================================================================
+Theme 1: Combat Aces!
+Jokers for this theme all synergize well with playing aces
+Common:
 Combat Ace - Soldier:
-Scored Aces add 35 chips.
-
-Combat Ace - Promotion:
-Played Aces have a 1 in 6 chance to become a random Edition
-
-Combat Ace - General:
-"Combat Ace Jokers" each give x1.5 Mult. Also counts itself
-
-Combat Ace - Recruiter
-Discarded cards have a 1 in 8 chance to become an Ace
-
+Each scored Ace adds +35 Chips.
+Also transforms into a negative Combat Ace - Veteran after 15 Rounds.
 Combat Ace - Mercenary:
-Scored Aces add x1.5 Mult. You have to pay $5 at the end of each round, or this Joker is destroyed
-
+Each scored Ace gives 1.5X Mult. At the end of a round pay $5, if you can't destroy this Joker.
+Combat Ace - Supplies
+For every 3 discarded Ace get $3.This bonus increases by $1 every time it activates.
+Uncommon:
+Combat Ace - Recruiter:
+Discarded Cards have a 1 in 8 chance to become an Ace.
+Combat Ace - Secret Agent:
+Copies the effect of an Combat Ace to it's right.
+Combat Ace - General:
+Combat Ace Joker each add 1.5X Mult. Also counts itself.
+Rare:
+Combat Ace - Promotion:
+Played Aces have a 1 in 6 chance to become a random edition.
+Legendary:
 Combat Ace - Veteran:
-Scored Aces repeat and add 50 chips. Adds +10 Chips to that effect at the end of each round.
-This is a legendary, but I added an alternative way to get this joker.
-![grafik](https://github.com/BlizzowX/Balatro---Themed-Jokers/assets/156582510/34b8669f-fe0d-4d4c-837b-f2c5f4a93eec)
+Each scored Ace repeats and adds +50 Chips. This bonus increases by 10 Chips every round.
+============================================================================== 
