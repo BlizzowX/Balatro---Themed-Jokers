@@ -12,6 +12,7 @@
 
 # Theme 1: **Combat Aces**!<br>
 Jokers for this theme all synergize well with playing aces<br>
+![grafik](https://github.com/BlizzowX/Balatro---Themed-Jokers/assets/156582510/b6f7b807-1cf7-4537-81d3-f5ce20fefb9f)
 __**Common:**__<br>
 **Combat Ace - Soldier:**<br>
 Each scored Ace adds +35 Chips.<br>
