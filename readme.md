@@ -8,6 +8,7 @@
 ## How to install:<br>
 1. Download the latest version of this mod<br>
 2. Extract the zip file to %appdata%\balatro\mods<br>
+*\*Requieres Steamodded*
 
 # Theme 1: **Combat Aces**!<br>
 Jokers for this theme all synergize well with playing aces<br>
