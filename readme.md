@@ -1,15 +1,15 @@
 Blizzow's Themed Jokers
 Jokers that may or may not synergize together
-==============================================================================
+
 Current Version: 0.3
 Currently adds 8 Jokers (1 Theme: 3 Common ,3 Uncommon, 1 Rare and 1 Legendary)
 Currently adds 0 Decks (Might add a deck for every theme at a later point)
-==============================================================================
+
 How to install:
 Download the latest version of this mod
 Simply download the zip file and extract it to %appdata%\balatro\mods
 *Steamodded is required to use this mod
-==============================================================================
+
 Theme 1: Combat Aces!
 Jokers for this theme all synergize well with playing aces
 Common:
@@ -33,4 +33,4 @@ Played Aces have a 1 in 6 chance to become a random edition.
 Legendary:
 Combat Ace - Veteran:
 Each scored Ace repeats and adds +50 Chips. This bonus increases by 10 Chips every round.
-============================================================================== 
+
