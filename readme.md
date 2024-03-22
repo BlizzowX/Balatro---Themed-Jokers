@@ -2,7 +2,7 @@
 ## Jokers that may or may not synergize together<br>
 
 **Current Version: 0.3**<br>
-**Currently adds 8 Jokers** (1 Theme: 3 Common ,3 Uncommon, 1 Rare and 1 Legendary)<br>
+**Currently adds 13 Jokers** (2 Theme: 3 Common ,6 Uncommon, 3 Rare and 1 Legendary)<br>
 **Currently adds 0 Decks** (Might add a deck for every theme at a later point)<br>
 
 ## How to install:<br>
@@ -10,7 +10,7 @@
 2. Extract the zip file to %appdata%\balatro\mods<br>
 *\*Requieres Steamodded*
 
-# Theme 1: **Combat Aces**!<br>
+# Theme 1:(8/8) **Combat Aces**!<br>
 Jokers for this theme all synergize well with playing aces<br>
 ![grafik](https://github.com/BlizzowX/Balatro---Themed-Jokers/assets/156582510/b6f7b807-1cf7-4537-81d3-f5ce20fefb9f)
 __**Common:**__<br>
@@ -35,13 +35,12 @@ __**Legendary:**__<br>
 **Combat Ace - Veteran:**<br>
 Each scored Ace repeats and adds +50 Chips. This bonus increases by 10 Chips every round.<br>
 
-# Theme 2: **Cosmic**!<br>
+# Theme 2:(5/13 Done) **Cosmic**!<br>
 Jokers for this theme all synergize well with playing aces<br>
-![grafik](https://github.com/BlizzowX/Balatro---Themed-Jokers/assets/156582510/b6f7b807-1cf7-4537-81d3-f5ce20fefb9f)
 __**Common:**__<br>
 ---
 __**Uncommon:**__<br>
-**Cosmic - Virgo:**<br>
+**Cosmic - Gemini:**<br>
 For every 2 cards scored with the same rank, add 1.1X Mult<br>
 Retrigger played 6 cards<br>
 **Cosmic - Leo:**<br>
