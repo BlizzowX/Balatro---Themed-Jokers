@@ -34,3 +34,29 @@ Played Aces have a 1 in 6 chance to become a random edition.<br>
 __**Legendary:**__<br>
 **Combat Ace - Veteran:**<br>
 Each scored Ace repeats and adds +50 Chips. This bonus increases by 10 Chips every round.<br>
+
+# Theme 2: **Cosmic**!<br>
+Jokers for this theme all synergize well with playing aces<br>
+![grafik](https://github.com/BlizzowX/Balatro---Themed-Jokers/assets/156582510/b6f7b807-1cf7-4537-81d3-f5ce20fefb9f)
+__**Common:**__<br>
+---
+__**Uncommon:**__<br>
+**Cosmic - Virgo:**<br>
+For every 2 cards scored with the same rank, add 1.1X Mult<br>
+Retrigger played 6 cards<br>
+**Cosmic - Leo:**<br>
+When other Cosmic Jokers retrigger played cards, 1 in 3 chance to retrigger them again.<br>
+Retrigger played King cards<br>
+**Cosmic - Virgo:**<br>
+When other Cosmic Jokers retrigger played cards, Add 1 Cosmic-Token to this card.<br>
+Retrigger played Queen cards<br>
+__**Rare:**__<br>
+**Cosmic - Libra:**<br>
+Scored Cards add half of their Chips value as Mult.<br>
+Retrigger played 10 cards<br>
+**Cosmic - Sagittarius:**<br>
+When you beat a Blind add 5 Cosmic Tokens to this card.<br>
+Gain 0.01X Mult for every Cosmic Token on your Jokers<br>
+Retrigger played Jack cards<br>
+__**Legendary:**__<br>
+---
