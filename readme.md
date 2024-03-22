@@ -38,7 +38,7 @@ Each scored Ace repeats and adds +50 Chips. This bonus increases by 10 Chips eve
 # Theme 2:(5/13 Done) **Cosmic**!<br>
 Jokers for this theme all synergize well with playing aces<br>
 __**Common:**__<br>
----
+
 __**Uncommon:**__<br>
 **Cosmic - Gemini:**<br>
 For every 2 cards scored with the same rank, add 1.1X Mult<br>
@@ -58,4 +58,3 @@ When you beat a Blind add 5 Cosmic Tokens to this card.<br>
 Gain 0.01X Mult for every Cosmic Token on your Jokers<br>
 Retrigger played Jack cards<br>
 __**Legendary:**__<br>
----
