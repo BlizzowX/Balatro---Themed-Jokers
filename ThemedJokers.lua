@@ -607,9 +607,10 @@ init_localization()
         pseudorandom('recruiter') < G.GAME.probabilities.normal/self.ability.extra.odds and
         context.other_card:get_id() ~= 14 then
             local card=context.other_card
-            local suit_prefix = string.sub(card.base.suit, 1, 1)..'_'
+            local suit_data = SMODS.Card.SUITS[card.base.suit]
+            local suit_prefix = suit_data.prefix .. '_'
 			local rank_suffix='A'			
-            shakecard(self)
+            shakecard(self) 
             card:set_base(G.P_CARDS[suit_prefix..rank_suffix])
             return {
                 message = localize('k_recruit'),
