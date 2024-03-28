@@ -71,7 +71,7 @@ function addcountertocosmo()
 end       
 
 
-local seals={"Gold", "Purple", "Blue"}
+local seals={"Gold", "Purple", "Blue", "Red"}
 if config.black then
     table.insert(seals, "Black")
 end 
