@@ -7,6 +7,13 @@
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
+--config for custom seal default false, user has to change it
+local config = {
+    black = false,
+    silver = false,
+    green = false
+}
+
 ---UTILITY METHODS---
 function destroyCard(self,sound)
     G.E_MANAGER:add_event(Event({
@@ -64,8 +71,16 @@ function addcountertocosmo()
 end       
 
 
-local seals={"Gold", "Purple", "Blue", }
-
+local seals={"Gold", "Purple", "Blue"}
+if config.black then
+    table.insert(seals, "Black")
+end 
+if config.green then
+    table.insert(seals, "Green")
+end 
+if config.silver then
+    table.insert(seals, "Silver")
+end 
 
 
 local localization = {
