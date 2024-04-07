@@ -14,7 +14,7 @@
 # Theme 1:(8/8) **Combat Aces**!<br>
 Jokers for this theme all synergize well with playing aces<br>
 
-# Theme 2:(13/13 Done) **Cosmic**!<br>
+# Theme 2:(13/13) **Cosmic**!<br>
 Cosmics collect Tokens on their jokers to boost them<br>
 
 # Theme 3:(6/6) **The Mischievous One**!<br>
