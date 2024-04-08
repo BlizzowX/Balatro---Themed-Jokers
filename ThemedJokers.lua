@@ -167,6 +167,10 @@ local jokers = {
 		pos = { x = 0, y = 0 },
         rarity=1,
         cost = 4,
+        blueprint_compat=true,
+        eternal_compat=true,
+        effect=nil,
+        soul_pos=nil,
         calculate = function(self,context)
             if context.individual and context.cardarea == G.play and (context.other_card:get_id() == 14) then
                 return {
@@ -175,7 +179,7 @@ local jokers = {
                 card = self
                 }
             end
-            if context.end_of_round and not (context.individual or context.repetition) and not context.blueprint then
+            if context.end_of_round and not (context.individual or context.repetition or context.blueprint) then
                 self.ability.extra.counter=self.ability.extra.counter+1
                 if self.ability.extra.counter>=15 then
                     destroyCard(self,'holo1')
@@ -305,7 +309,7 @@ local jokers = {
             end
             if context.end_of_round and not (context.individual or context.repetition) then
                 shakecard(self)
-                if G.GAME.dollars>5 then
+                if G.GAME.dollars>=5 then
                     ease_dollars(-5)
                     return {
                         message = localize('k_mercenary_pay'),
@@ -464,7 +468,7 @@ local jokers = {
                 }
             end
     
-            if context.end_of_round and not (context.individual or context.repetition) then
+            if context.end_of_round and not (context.individual or context.repetition or context.blueprint) then
                 self.ability.extra.counter=self.ability.extra.counter+1
                 self.ability.extra.bonustotal=self.ability.extra.chips+self.ability.extra.counter*10
                 return {
@@ -725,7 +729,7 @@ local jokers = {
         soul_pos=nil,
         calculate = function(self,context)
             if context.individual and context.cardarea == G.play then
-                if (context.other_card:get_id() == 2) then
+                if not context.blueprint and (context.other_card:get_id() == 2) then
                     addtokentocosmic(self,1)
                 end 
                 context.other_card.ability.perma_bonus = context.other_card.ability.perma_bonus or 0
@@ -762,7 +766,7 @@ local jokers = {
         soul_pos=nil,
         calculate = function(self,context)
             if context.individual and context.cardarea == G.play then
-                if (context.other_card:get_id() == 3) then
+                if not context.blueprint and (context.other_card:get_id() == 3) then
                     addtokentocosmic(self,1)
                 end                
                 if pseudorandom('aquarius') < G.GAME.probabilities.normal/self.ability.extra.odds then
@@ -799,7 +803,7 @@ local jokers = {
         effect=nil,
         soul_pos=nil,
         calculate = function(self,context)
-            if context.individual and context.cardarea == G.play and (context.other_card:get_id() == 4) then
+            if not context.blueprint and  context.individual and context.cardarea == G.play and (context.other_card:get_id() == 4) then
                 addtokentocosmic(self,1)
                 self.ability.extra.mult=self.ability.extra.mult+1                
                 return {                
@@ -829,7 +833,8 @@ local jokers = {
         text = {         
             "Gains {C:chips}+10{} Chips and {C:purple}+1 Cosmic-Token{}.",
             "per {C:attention}5{} scored. {C:inactive}(Currently {C:chips}+#2#{} {C:inactive}Chips)",
-			"{C:inactive}(Unyielding courage fuels Aries' pursuits.)"            
+			"{C:inactive}(Unyielding courage fuels Aries' pursuits.)" ,
+            "{C:inactive}({C:purple}Cosmic-Tokens:{} {X:purple,C:white}#1#{}{C:inactive})"                        
 		},
 		ability = {extra={tokens=0,chips=30}},
 		pos = { x = 3, y = 2 },
@@ -840,7 +845,7 @@ local jokers = {
         effect=nil,
         soul_pos=nil,
         calculate = function(self,context)
-            if context.individual and context.cardarea == G.play and (context.other_card:get_id() == 5) then
+            if not context.blueprint and context.individual and context.cardarea == G.play and (context.other_card:get_id() == 5) then
                 addtokentocosmic(self,1)
                 self.ability.extra.chips=self.ability.extra.chips+10                
                 return {                
@@ -885,7 +890,7 @@ local jokers = {
         calculate = function(self,context)
             self.ability.extra.chance=5+self.ability.extra.tokens
             if context.individual and context.cardarea == G.play then
-                if (context.other_card:get_id() == 6) then
+                if not context.blueprint and  (context.other_card:get_id() == 6) then
                     addtokentocosmic(self,1)
                 end
                 --add random edition to card
@@ -916,13 +921,13 @@ local jokers = {
     cosmicgemini = {
         name = "Cosmic - Gemini",
         text = {   
-            "Gains {C:green}4%{} chance per {C:purple}Cosmic-Token{} on this",
+            "Gains {C:green}1%{} chance per {C:purple}Cosmic-Token{} on this",
             "to {C:attention}retrigger{} scored cards. {C:inactive}(Currently {C:green}#2#%{}{C:inactive} chance)",      
             "{C:purple}+1 Cosmic-Token{} per {C:attention}7{} scored.",
 			"{C:inactive}(Curious intellect propels Gemini's exploration.)",
             "{C:inactive}({C:purple}Cosmic-Tokens:{} {X:purple,C:white}#1#{}{C:inactive})"      
 		},
-		ability = {extra={tokens=0,chance=12}},
+		ability = {extra={tokens=0,chance=5}},
 		pos = { x = 5, y = 2 },
         rarity=2,
         cost = 8,
@@ -931,9 +936,9 @@ local jokers = {
         effect=nil,
         soul_pos=nil,
         calculate = function(self,context)
-            self.ability.extra.chance=12+(self.ability.extra.tokens*4)
+            self.ability.extra.chance=5+self.ability.extra.tokens
             
-            if context.individual and context.cardarea == G.play and (context.other_card:get_id() == 7)  then
+            if not context.blueprint and  context.individual and context.cardarea == G.play and (context.other_card:get_id() == 7)  then
                 addtokentocosmic(self,1)           
             end
             
@@ -943,7 +948,7 @@ local jokers = {
                 --if 120% chance = +1 repetition guaranteed. after that 120-(100*1)/100 chance for +2 
                 if pseudorandom('gemini') < (self.ability.extra.chance-(100*_repetitions))/100 then
                     _repetitions=_repetitions+1
-                end
+                end                
                 return {
                     message = localize('k_again_ex'),
                     repetitions = _repetitions,
@@ -979,7 +984,7 @@ local jokers = {
         calculate = function(self,context)
             self.ability.extra.chance=5+self.ability.extra.tokens
             
-            if context.individual and context.cardarea == G.play and (context.other_card:get_id() == 8)  then
+            if not context.blueprint and  context.individual and context.cardarea == G.play and (context.other_card:get_id() == 8)  then
                 addtokentocosmic(self,1)
             end
             if context.discard and not context.other_card.debuff and pseudorandom('cancer') < self.ability.extra.chance/100 then                
@@ -1031,7 +1036,7 @@ local jokers = {
         calculate = function(self,context)
             self.ability.extra.chance=5+self.ability.extra.tokens
             
-            if context.individual and context.cardarea == G.play and (context.other_card:get_id() == 9)  then
+            if not context.blueprint and  context.individual and context.cardarea == G.play and (context.other_card:get_id() == 9)  then
                 addtokentocosmic(self,1)           
             end
             if context.discard and not context.other_card.debuff and pseudorandom('leo') < self.ability.extra.chance/100 then 
@@ -1078,12 +1083,11 @@ local jokers = {
                 self.ability.extra.decrease=70
             end
 
-            if context.individual and context.cardarea == G.play and (context.other_card:get_id() == 10)  then
+            if not context.blueprint and  context.individual and context.cardarea == G.play and (context.other_card:get_id() == 10)  then
                 addtokentocosmic(self,1)           
             end
 
             if context.setting_blind then
-                ease_dollars(G.GAME.blind.chips)
                 self.ability.extra.blindbuffer=G.GAME.blind.chips               
             end
 
@@ -1122,7 +1126,7 @@ local jokers = {
             self.ability.extra.chipasmult=20+self.ability.extra.tokenstotal      
 
 
-            if context.individual and context.cardarea == G.play then
+            if not context.blueprint and  context.individual and context.cardarea == G.play then
                 if (context.other_card:get_id() == 11)  then 
                     addtokentocosmic(self,1)   
                 end   
@@ -1170,7 +1174,7 @@ local jokers = {
             self.ability.extra.bonuschips=3+self.ability.extra.tokenstotal  
 
             if context.individual and context.cardarea == G.play then
-                if (context.other_card:get_id() == 12) then
+                if not context.blueprint and  (context.other_card:get_id() == 12) then
                     addtokentocosmic(self,1)
                 end 
                 context.other_card.ability.perma_bonus = context.other_card.ability.perma_bonus or 0
@@ -1211,7 +1215,7 @@ local jokers = {
             self.ability.extra.mult=30+self.ability.extra.tokenstotal  
 
             if context.individual and context.cardarea == G.play then
-                if (context.other_card:get_id() == 13) then
+                if not context.blueprint and  (context.other_card:get_id() == 13) then
                     addtokentocosmic(self,1)
                 end                  
             end
@@ -1231,14 +1235,14 @@ local jokers = {
             info_queue[#info_queue+1] = { set = 'Other', key = 'cosmic_token' }
         end                
 	},
-    cosmicsophiuchus = {
+    cosmicophiuchus = {
         name = "Cosmic - Ophiuchus",
         text = {                   
             "Gains {X:mult,C:white}X0.01{} Mult per {C:purple}Cosmic-Token{}",
             "on all your {C:purple}Cosmic Jokers{}. {C:inactive}(Currently {X:mult,C:white}X#2#{}{C:inactive} Mult)",
             "{C:purple}Cosmic Jokers{} gain 3X as many {C:purple}Cosmic-Tokens{}.",
 			"{C:inactive}(When the stars gather, Ophiuchus shines once more)",
-            "{C:inactive}(Total {C:purple}Cosmic-Tokens:{} {X:purple,C:white}#1#{}{C:inactive})"      
+            "{C:inactive}(Total {C:purple}Cosmic-Tokens:{} {X:purple,C:white}#3#{}{C:inactive})"      
 		},
 		ability = {extra={tokens=0,x_mult=1,tokenstotal=0}},
 		pos = { x = 12, y = 2 },
@@ -1268,6 +1272,40 @@ local jokers = {
             info_queue[#info_queue+1] = { set = 'Other', key = 'cosmic_token' }
         end                
 	},
+--[[     omenbrokenmirror = {
+        name = "Omen - Broken Mirror",
+        text = {                   
+            "{C:green}#1# in #2#{} chance to turn", 
+            "scored cards into glass cards.",
+            "{C:red}#1# in #3#{} chance to {C:attention}shatter{} after scoring", 
+			"{C:inactive}(Mirror, mirror on the wall.)"  
+		},
+		ability = {extra={odds=6,badodds=6}},
+		pos = { x = 0, y = 4 },
+        rarity=1,
+        cost = 4,
+        blueprint_compat=true,
+        eternal_compat=true,
+        effect=nil,
+        soul_pos=nil,
+        calculate = function(self,context)
+            if context.other_joker then      
+                if context.other_joker == self then
+                    return {
+                    message = localize{type='variable',key='a_x_mult',vars={self.ability.extra.mult}},
+                    Xmult_mod = self.ability.extra.x_mult
+                    }
+                end
+            end
+
+        end,
+        loc_def=function(self)
+            return {self.ability.extra.tokens,self.ability.extra.x_mult, self.ability.extra.tokenstotal}
+        end,
+        tooltip=function(self, info_queue)
+            info_queue[#info_queue+1] = { set = 'Other', key = 'shatter' }
+        end                
+	}, ]]
 }
 
 
@@ -1278,6 +1316,9 @@ local jokers = {
 
 function SMODS.INIT.ThemedJokers()
     ---localization texts:---
+    --OMEN
+    G.localization.misc.dictionary.k_shatter = "Shattered!"
+    G.localization.misc.dictionary.k_save = "Save!"
     --COSMIC
     G.localization.misc.dictionary.k_c_upgrade = "Cosmic Upgrade!"
     G.localization.misc.dictionary.k_c_dollars = "Cosmic Money!"
@@ -1297,6 +1338,13 @@ function SMODS.INIT.ThemedJokers()
     
     
     ---localization tooltips:---
+    G.localization.descriptions.Other["shatter"] = {
+        name = "Shatter",
+        text = {
+            "When this card shatters,",
+            "Create 1 {C:attention}Mirror Shard"
+        }
+    }
     G.localization.descriptions.Other["cosmic_token"] = {
         name = "Cosmic-Token",
         text = {

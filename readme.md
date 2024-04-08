@@ -1,7 +1,7 @@
 # Blizzow's Themed Jokers<br>
 ## Jokers that may or may not synergize together<br>
 
-**Current Version: 0.6**<br>
+**Current Version: 0.7**<br>
 **Currently adds 27 Jokers**<br>
 **Currently adds 5 Tarots**<br>
 **Currently adds 3 Decks**<br>

@@ -163,7 +163,7 @@ local tarots = {
             "Up to 3 selected cards gain",
             "{C:chips}+15{} Chips permanently",
             "All {C:purple}Cosmic Jokers{} gain",
-            "{C:purple}+5 Cosmic-Tokens{}.",
+            "{C:purple}+5 Cosmic-Tokens{}."
 		},
 		config = {max_highlighted = 3},
 		pos = { x = 0, y = 0 },
@@ -204,7 +204,7 @@ local tarots = {
             "All {C:purple}Cosmic Jokers{} gain {C:purple}+10 Cosmic-Tokens{}.",
             "If you have more than 150",
             "{C:purple}Cosmic-Token{} on your Jokers,",
-            "create a negative {C:legendary}Cosmic Ophiuchus."
+            "create a negative {C:legendary}Cosmic - Ophiuchus."
 		},
 		config = {},
 		pos = { x = 2, y = 0 },
@@ -214,16 +214,16 @@ local tarots = {
         consumable=true,
         discovered=true,
         can_use = function() 
-            if  checkforcosmic() and not checkforcosmicophiuchus() then
+            if  checkforcosmic() then
                 return true
             end          
         end,
         use = function(self, area, copier)    
             if self.ability.name == 'The Sign' then
                 addtokentoallcosmic(10) 
-                if countcosmictokens()>150 then
+                if countcosmictokens()>150 and not checkforcosmicophiuchus() then
                 G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                    play_sound('timpani')
+                    play_sound('timpani')                    
                     addjoker('j_cosmicophiuchus',true)
                     self:juice_up(0.3, 0.5)
                     return true end }))
