@@ -49,7 +49,7 @@ function fakemessage(_message,_card,_colour)
 end
 
 
-function poll_enhancement()
+function poll_enhancement(seed)
     local enhancements = {}
     --add all enhancements but m_stone to list
     for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
@@ -57,7 +57,7 @@ function poll_enhancement()
             enhancements[#enhancements+1] = v
         end
     end
-    return math.random(1,#enhancements)
+    return pseudorandom_element(enhancements, pseudoseed(seed))
 end
 
 
@@ -898,14 +898,10 @@ local jokers = {
                     local card = context.other_card
                     
                     if card.config.center == G.P_CENTERS.c_base then --if card is c_base/without enhancements
-                    local enhancement = poll_enhancement()
-                    shakecard(card)
-                    card:set_ability(enhancement)
-                    return {
-                        message = localize('k_c_upgrade'),
-                        colour = G.C.PURPLE,
-                        card = card
-                    }
+                    local enhancement = poll_enhancement('taurus')
+                    G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('card1', 5);card:juice_up(0.3, 0.3);return true end }))
+                    G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('tarot1', 5);card:set_ability(enhancement);return true end }))
+                    fakemessage(localize('k_c_upgrade'),self,G.C.PURPLE)
                     end    
                 end                                
             end            
@@ -1258,7 +1254,7 @@ local jokers = {
             if context.other_joker then      
                 if context.other_joker == self then
                     return {
-                    message = localize{type='variable',key='a_x_mult',vars={self.ability.extra.mult}},
+                    message = localize{type='variable',key='a_xmult',vars={self.ability.extra.x_mult}},
                     Xmult_mod = self.ability.extra.x_mult
                     }
                 end
