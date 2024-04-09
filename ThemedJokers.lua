@@ -1036,6 +1036,7 @@ local jokers = {
                 addtokentocosmic(self,1)           
             end
             if context.discard and not context.other_card.debuff and pseudorandom('leo') < self.ability.extra.chance/100 then 
+                    local card = context.other_card
                     if card:get_edition() ~= nil then return nil end
                     local edition = poll_edition('leo', nil, true, true)
                     shakecard(card)
