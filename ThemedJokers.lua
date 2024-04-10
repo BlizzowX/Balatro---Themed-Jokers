@@ -52,7 +52,7 @@ end
 function poll_enhancement(seed)
     local enhancements = {}
     --add all enhancements but m_stone to list
-    for k, v in pairs(G.P_CENTER_POOLS["Enhanced"]) do
+    for k, v in pairs() do
         if v.key ~= 'm_stone' then 
             enhancements[#enhancements+1] = v
         end
@@ -60,19 +60,33 @@ function poll_enhancement(seed)
     return pseudorandom_element(enhancements, pseudoseed(seed))
 end
 
+function poll_seal(seed)
+    local seals = {}
+    for k, v in pairs(G.P_SEALS) do
+        seals[#seals+1] = v
+    end
+    return pseudorandom_element(seals, pseudoseed(seed)).key
+end
+
+function poll_FromTable(_table,seed,filter)
+    local items = {}    
+    for k, v in pairs(_table) do
+        if items.key ~= filter then
+            items[#items+1] = v
+        end        
+    end
+    return pseudorandom_element(items, pseudoseed(seed))
+end
 
 
-
-    --G.P_Tags 
-    --G.P_Cards
-    --G.P_Seals
+    --G.P_TAGS 
+    --G.P_CARDS
+    --G.P_SEALS
 function randomFromTable(source)
     local keys = {} 
-
     for k in pairs(source) do
         table.insert(keys, k)
-    end
-    
+    end    
     local choiceIndex = math.random(1,#keys) 
     local choiceKey = keys[choiceIndex] 
     local choice = source[choiceKey]
@@ -858,7 +872,7 @@ local jokers = {
                 if context.other_joker == self then
                     return {
                     message = localize{type='variable',key='a_chips',vars={self.ability.extra.chips}},
-                    chips_mod = self.ability.extra.mult
+                    chip_mod = self.ability.extra.chips
                     }
                 end 
             end
@@ -898,7 +912,7 @@ local jokers = {
                     local card = context.other_card
                     
                     if card.config.center == G.P_CENTERS.c_base then --if card is c_base/without enhancements
-                    local enhancement = poll_enhancement('taurus')
+                    local enhancement = poll_FromTable(G.P_CENTER_POOLS["Enhanced"],'taurus','m_stone')
                     G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('card1', 5);card:juice_up(0.3, 0.3);return true end }))
                     G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('tarot1', 5);card:set_ability(enhancement);return true end }))
                     fakemessage(localize('k_c_upgrade'),self,G.C.PURPLE)
@@ -992,8 +1006,8 @@ local jokers = {
                         return true end }))
                     
                     G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
-                        seal=randomFromTable(G.P_SEALS)
-                        card:set_seal(seal.key, nil, true)
+                        seal=poll_seal('cancer')
+                        card:set_seal(seal, nil, true)
                         return true end }))
                         
                         return {
@@ -1036,16 +1050,16 @@ local jokers = {
                 addtokentocosmic(self,1)           
             end
             if context.discard and not context.other_card.debuff and pseudorandom('leo') < self.ability.extra.chance/100 then 
-                    local card = context.other_card
-                    if card:get_edition() ~= nil then return nil end
-                    local edition = poll_edition('leo', nil, true, true)
-                    shakecard(card)
-                    card:set_edition(edition)
-                    return {
-                        message = localize('k_c_upgrade'),
-                        colour = G.C.PURPLE,
-                        card = card
-                    } 
+                local card=context.other_card
+                if card:get_edition() ~= nil then return nil end
+                local edition = poll_edition('leo', nil, true, true)
+                shakecard(card)
+                card:set_edition(edition)
+                return {
+                    message = localize('k_c_upgrade'),
+                    colour = G.C.PURPLE,
+                    card = card
+                } 
             end
         end,
         loc_def=function(self)
@@ -1269,7 +1283,7 @@ local jokers = {
             info_queue[#info_queue+1] = { set = 'Other', key = 'cosmic_token' }
         end                
 	},
---[[     omenbrokenmirror = {
+   --[[  omenbrokenmirror = {
         name = "Omen - Broken Mirror",
         text = {                   
             "{C:green}#1# in #2#{} chance to turn", 
@@ -1277,32 +1291,48 @@ local jokers = {
             "{C:red}#1# in #3#{} chance to {C:attention}shatter{} after scoring", 
 			"{C:inactive}(Mirror, mirror on the wall.)"  
 		},
-		ability = {extra={odds=6,badodds=6}},
+		ability = {extra={positiveodds=2,negativeodds=2}},
 		pos = { x = 0, y = 4 },
-        rarity=1,
-        cost = 4,
+        rarity=2,
+        cost = 8,
         blueprint_compat=true,
         eternal_compat=true,
         effect=nil,
         soul_pos=nil,
         calculate = function(self,context)
-            if context.other_joker then      
-                if context.other_joker == self then
-                    return {
-                    message = localize{type='variable',key='a_x_mult',vars={self.ability.extra.mult}},
-                    Xmult_mod = self.ability.extra.x_mult
-                    }
+            if SMODS.end_calculate_context(context) then
+                if pseudorandom('brokenmirror') < G.GAME.probabilities.normal / self.ability.extra.positiveodds then
+                    fakemessage(localize('k_o_lucky'),self,G.C.PURPLE)
+                for i= 1, #context.full_hand do
+                    local card=context.full_hand[i]
+                    if card.config.center == G.P_CENTERS.c_base then --if card is c_base/without enhancements
+                        local enhancement = 'm_lucky'
+                        G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('card1', 5);card:juice_up(0.3, 0.3);return true end }))
+                        G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('tarot1', 5);card:set_ability(enhancement);return true end }))
+                    end
                 end
-            end
-
+                if pseudorandom('brokenmirror2') < G.GAME.probabilities.normal / self.ability.extra.negativeodds then
+                    fakemessage(localize('k_o_unlucky'),self,G.C.PURPLE)
+                    destroyCard(self,glass)
+                    if  #G.jokers.cards < G.jokers.config.card_limit then
+                        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+                            play_sound('timpani')                    
+                            addjoker('j_omenbrokenmirror')
+                            self:juice_up(0.3, 0.5)
+                            return true end }))
+                        delay(0.6)   
+                        end
+                    end
+                end
+            end 
         end,
         loc_def=function(self)
-            return {self.ability.extra.tokens,self.ability.extra.x_mult, self.ability.extra.tokenstotal}
+            return {''..(G.GAME and G.GAME.probabilities.normal or 1),self.ability.extra.positiveodds,self.ability.extra.negativeodds}
         end,
         tooltip=function(self, info_queue)
             info_queue[#info_queue+1] = { set = 'Other', key = 'shatter' }
         end                
-	}, ]]
+	},  ]]
 }
 
 
@@ -1314,8 +1344,8 @@ local jokers = {
 function SMODS.INIT.ThemedJokers()
     ---localization texts:---
     --OMEN
-    G.localization.misc.dictionary.k_shatter = "Shattered!"
-    G.localization.misc.dictionary.k_save = "Save!"
+    G.localization.misc.dictionary.k_o_lucky = "Lucky!"
+    G.localization.misc.dictionary.k_o_unlucky = "Unlucky!"
     --COSMIC
     G.localization.misc.dictionary.k_c_upgrade = "Cosmic Upgrade!"
     G.localization.misc.dictionary.k_c_dollars = "Cosmic Money!"
@@ -1339,7 +1369,9 @@ function SMODS.INIT.ThemedJokers()
         name = "Shatter",
         text = {
             "When this card shatters,",
-            "Create 1 {C:attention}Mirror Shard"
+            "destroy it. Then",
+            "create 1 {C:attention}Omen - Mirror Shard",
+            "{C:inactive}(Must have room)"
         }
     }
     G.localization.descriptions.Other["cosmic_token"] = {
@@ -1409,12 +1441,8 @@ function SMODS.INIT.ThemedJokers()
         if not config.vanillaart and string.match(k,'cosmic') then
             v.pos.y=v.pos.y+1
         end
-
         local joker = SMODS.Joker:new(v.name, k, v.ability, v.pos, { name = v.name, text = v.text }, v.rarity, v.cost, true, true, v.blueprint_compat, v.eternal_compat, v.effect, "ThemedJokers",v.soul_pos)
         -- SMODS.Joker:new(name, slug, config, spritePos, tloc_tx, rarity, cost, unlocked, discovered, blueprint_compat, eternal_compat, effect, atlas, soul_pos)
-        
-
-
         joker:register()
         --added calculate function into jokers to make code cleaner
         SMODS.Jokers[joker.slug].calculate=v.calculate
@@ -1423,9 +1451,7 @@ function SMODS.INIT.ThemedJokers()
         if(v.tooltip ~= nil) then
             SMODS.Jokers[joker.slug].tooltip=v.tooltip
         end
-
     end
-
     --Create sprite atlas
     SMODS.Sprite:new("ThemedJokers", SMODS.findModByID("ThemedJokers").path, "ThemedJokers.png", 71, 95, "asset_atli"):register()
 end
