@@ -42,7 +42,7 @@ function shakecard(self)
     }))
 end
 function fakemessage(_message,_card,_colour)
-    G.E_MANAGER:add_event(Event({        
+    G.E_MANAGER:add_event(Event({ trigger = 'after',delay = 0.15,       
         func = function() card_eval_status_text(_card, 'extra', nil, nil, nil, {message = _message, colour = _colour, instant=true}); return true
         end}))
     return
@@ -71,7 +71,7 @@ end
 function poll_FromTable(_table,seed,filter)
     local items = {}    
     for k, v in pairs(_table) do
-        if items.key ~= filter then
+        if v.key ~= filter then
             items[#items+1] = v
         end        
     end
@@ -145,6 +145,64 @@ function countpieces()
     return count-1
 end
 
+function trigger_badkarma(card)
+    fakemessage(localize('k_o_unlucky'),card,G.C.RED)
+    for i= 1, #G.jokers.cards do
+        other_joker = G.jokers.cards[i]
+        if other_joker.ability.name=="Omen - Thirteen" then
+            other_joker.ability.extra.x_mult=other_joker.ability.extra.x_mult+0.25
+            shakecard(other_joker)
+            fakemessage("+X0.25 Mult",other_joker,G.C.RED)
+        end
+    end
+end
+
+function trigger_goodkarma(card)
+    fakemessage(localize('k_o_lucky'),card,G.C.GREEN)
+    for i= 1, #G.jokers.cards do
+        other_joker = G.jokers.cards[i]
+        if other_joker.ability.name=="Omen - Seven" then
+            other_joker.ability.extra.x_mult=other_joker.ability.extra.x_mult+0.25
+            shakecard(other_joker)
+            fakemessage("+X0.25 Mult",other_joker,G.C.RED)
+        end
+    end
+end
+
+function mod_badkarma(increment)
+    for i= 1, #G.jokers.cards do
+        other_joker = G.jokers.cards[i]
+        if string.match(other_joker.ability.name,"Omen -") then
+            other_joker.ability.extra.negativeodds=other_joker.ability.extra.negativeodds+increment
+            if other_joker.ability.extra.negativeodds < 1 then
+                other_joker.ability.extra.negativeodds=1
+            end
+            if increment > 0 then
+                fakemessage("+ Karma",other_joker,G.C.RED)
+            else
+                fakemessage("- Karma",other_joker,G.C.RED)
+            end
+        end 
+    end
+end
+function mod_goodkarma(increment)
+    for i= 1, #G.jokers.cards do
+        other_joker = G.jokers.cards[i]
+        if string.match(other_joker.ability.name,"Omen -") then
+            other_joker.ability.extra.positiveodds=other_joker.ability.extra.positiveodds+increment
+            if other_joker.ability.extra.positiveodds < 1 then
+                other_joker.ability.extra.positiveodds=1
+            end
+            if increment > 0 then
+                fakemessage("+ Karma",other_joker,G.C.GREEN)
+            else
+                fakemessage("- Karma",other_joker,G.C.GREEN)
+            end
+        end 
+    end
+end
+
+
 function checkforpieces(card)
     card.ability.extra.pieceone=0
     card.ability.extra.piecetwo=0
@@ -170,7 +228,7 @@ end
 
 
 local jokers = {
-     combatacesoldier = {
+      combatacesoldier = {
         name = "Combat Ace - Soldier",
         text = {
             "Each scored {C:attention}Ace{}",			
@@ -275,11 +333,15 @@ local jokers = {
             if context.discard and not context.other_card.debuff and context.other_card:get_id()==14 then        
                 local card=context.other_card
                 shakecard(self)
-                self.ability.extra.counter=self.ability.extra.counter-1            
+                if not context.blueprint then
+                self.ability.extra.counter=self.ability.extra.counter-1
+                end     
                 if self.ability.extra.counter==0 then
                     self.ability.extra.counter=3
                     ease_dollars(self.ability.extra.dollars)
+                    if not context.blueprint then
                     self.ability.extra.dollars=self.ability.extra.dollars+1
+                    end
                     return {
                         message = localize('k_supplydrop'),
                         card = card,
@@ -321,7 +383,7 @@ local jokers = {
                     x_mult = self.ability.extra.x_mult 
                 }
             end
-            if context.end_of_round and not (context.individual or context.repetition) then
+            if context.end_of_round and not (context.individual or context.repetition or context.blueprint) then
                 shakecard(self)
                 if G.GAME.dollars>=5 then
                     ease_dollars(-5)
@@ -459,8 +521,8 @@ local jokers = {
 		},
 		ability = {extra={chips=50, counter=0, bonustotal=50}},
 		pos = { x = 7, y = 0 },
-        rarity=1,
-        cost = 4,
+        rarity=4,
+        cost = 20,
         blueprint_compat=true,
         eternal_compat=true,
         effect=nil,
@@ -931,7 +993,7 @@ local jokers = {
     cosmicgemini = {
         name = "Cosmic - Gemini",
         text = {   
-            "Gains {C:green}1%{} chance per {C:purple}Cosmic-Token{} on this",
+            "Gains {C:green}0.5%{} chance per {C:purple}Cosmic-Token{} on this",
             "to {C:attention}retrigger{} scored cards. {C:inactive}(Currently {C:green}#2#%{}{C:inactive} chance)",      
             "{C:purple}+1 Cosmic-Token{} per {C:attention}7{} scored.",
 			"{C:inactive}(Curious intellect propels Gemini's exploration.)",
@@ -946,8 +1008,10 @@ local jokers = {
         effect=nil,
         soul_pos=nil,
         calculate = function(self,context)
-            self.ability.extra.chance=5+self.ability.extra.tokens
-            
+            self.ability.extra.chance=5+(self.ability.extra.tokens*0.25)
+            if self.ability.extra.chance>120 then
+                self.ability.extra.chance=120
+            end
             if not context.blueprint and  context.individual and context.cardarea == G.play and (context.other_card:get_id() == 7)  then
                 addtokentocosmic(self,1)           
             end
@@ -1282,16 +1346,16 @@ local jokers = {
         tooltip=function(self, info_queue)
             info_queue[#info_queue+1] = { set = 'Other', key = 'cosmic_token' }
         end                
-	},
-   --[[  omenbrokenmirror = {
+	}, 
+     omenbrokenmirror = {
         name = "Omen - Broken Mirror",
         text = {                   
             "{C:green}#1# in #2#{} chance to turn", 
-            "scored cards into glass cards.",
+            "scored hand into {C:attention}Glass Cards{}.",
             "{C:red}#1# in #3#{} chance to {C:attention}shatter{} after scoring", 
 			"{C:inactive}(Mirror, mirror on the wall.)"  
 		},
-		ability = {extra={positiveodds=2,negativeodds=2}},
+		ability = {extra={positiveodds=6,negativeodds=4}},
 		pos = { x = 0, y = 4 },
         rarity=2,
         cost = 8,
@@ -1302,22 +1366,22 @@ local jokers = {
         calculate = function(self,context)
             if SMODS.end_calculate_context(context) then
                 if pseudorandom('brokenmirror') < G.GAME.probabilities.normal / self.ability.extra.positiveodds then
-                    fakemessage(localize('k_o_lucky'),self,G.C.PURPLE)
+                    trigger_goodkarma(self)
                 for i= 1, #context.full_hand do
                     local card=context.full_hand[i]
                     if card.config.center == G.P_CENTERS.c_base then --if card is c_base/without enhancements
-                        local enhancement = 'm_lucky'
+                        local enhancement = G.P_CENTERS.m_glass
                         G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('card1', 5);card:juice_up(0.3, 0.3);return true end }))
                         G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('tarot1', 5);card:set_ability(enhancement);return true end }))
                     end
                 end
                 if pseudorandom('brokenmirror2') < G.GAME.probabilities.normal / self.ability.extra.negativeodds then
-                    fakemessage(localize('k_o_unlucky'),self,G.C.PURPLE)
+                    trigger_badkarma(self)
                     destroyCard(self,glass)
                     if  #G.jokers.cards < G.jokers.config.card_limit then
                         G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
                             play_sound('timpani')                    
-                            addjoker('j_omenbrokenmirror')
+                            addjoker('j_omenmirrorshard')
                             self:juice_up(0.3, 0.5)
                             return true end }))
                         delay(0.6)   
@@ -1332,7 +1396,217 @@ local jokers = {
         tooltip=function(self, info_queue)
             info_queue[#info_queue+1] = { set = 'Other', key = 'shatter' }
         end                
-	},  ]]
+	},  
+    omenmirrorshard= {
+        name = "Omen - Mirror Shard",
+        text = {
+            "When selecting a {C:attention}blind{}:",                   
+            "{C:green}#1# in #2#{} chance to turn into",
+            "{C:attention}Omen - Broken Mirror{}.{C:inactive}",
+            "{C:red}#1# in #3#{} chance to get {C:red}destroyed{}.", 
+			"{C:inactive}(... lucky?)"  
+		},
+		ability = {extra={positiveodds=3,negativeodds=3}},
+		pos = { x = 1, y = 4 },
+        rarity=1,
+        cost = 2,
+        blueprint_compat=false,
+        eternal_compat=true,
+        effect=nil,
+        soul_pos=nil,
+        calculate = function(self,context)
+            if context.setting_blind then
+                 if pseudorandom('mirrorshard') < G.GAME.probabilities.normal / self.ability.extra.positiveodds then
+                    trigger_goodkarma(self)
+                    destroyCard(self,glass)
+                    if  #G.jokers.cards < G.jokers.config.card_limit then
+                        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+                            play_sound('timpani')                    
+                            addjoker('j_omenbrokenmirror')
+                            self:juice_up(0.3, 0.5)
+                            return true end }))
+                        delay(0.6)   
+                        end
+                    end
+                else if pseudorandom('mirrorshard2') < G.GAME.probabilities.normal / self.ability.extra.negativeodds then
+                    trigger_badkarma(self)
+                    destroyCard(self,glass)
+                end
+            end          
+        end,
+        loc_def=function(self)
+            return {''..(G.GAME and G.GAME.probabilities.normal or 1),self.ability.extra.positiveodds,self.ability.extra.negativeodds}
+        end,              
+	}, 
+    omensuspiciousladder= {
+        name = "Omen - Suspicious Ladder",
+        text = {
+            "When selecting a {C:attention}blind{}:",                   
+            "{C:green}#1# in #2#{} chance to {C:green}decrease blind size{}.", 
+            "{C:red}#1# in #3#{} chance to {C:red}increase blind size{}", 
+			"{C:inactive}(It just stands there. Menacingly!)"  
+		},
+		ability = {extra={positiveodds=6,negativeodds=4}},
+		pos = { x = 2, y = 4 },
+        rarity=2,
+        cost = 8,
+        blueprint_compat=false,
+        eternal_compat=true,
+        effect=nil,
+        soul_pos=nil,
+        calculate = function(self,context)
+            if context.setting_blind then
+                local increase=false
+                local decrease=false
+                if pseudorandom('suspiciousladder') < G.GAME.probabilities.normal / self.ability.extra.positiveodds then
+                    increase=true
+                end
+                if pseudorandom('suspiciousladder2') < G.GAME.probabilities.normal / self.ability.extra.negativeodds then
+                    decrease=true
+                end
+                if decrease==true and increase==true then
+                    if pseudorandom('suspiciousladder3')>=0.5 then
+                        decrease=false
+                    else
+                        increase=false
+                    end                
+                elseif decrease==true then
+                    trigger_goodkarma(self)
+                    G.GAME.blind.chips=math.ceil(G.GAME.blind.chips*0.8)
+                    G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+                elseif increase==true then
+                    trigger_badkarma(self)
+                    G.GAME.blind.chips=math.ceil(G.GAME.blind.chips*1.2)
+                    G.GAME.blind.chip_text = number_format(G.GAME.blind.chips)
+                end
+            end          
+        end,
+        loc_def=function(self)
+            return {''..(G.GAME and G.GAME.probabilities.normal or 1),self.ability.extra.positiveodds,self.ability.extra.negativeodds}
+        end,   
+        tooltip=function(self, info_queue)
+            info_queue[#info_queue+1] = { set = 'Other', key = 'omen_blindsize' }
+        end      
+	},   
+    omenblackcat= {
+        name = "Omen - Black Cat",
+        text = {                               
+            "{C:green}#1# in #2#{} chance to turn", 
+            "scored hand into {C:attention}Lucky Cards{}.",
+            "{C:red}#1# in #3#{} chance to {C:red}lose {C:money}$2{} after scoring", 
+			"{C:inactive}(Why did the cat cross the road?)"  
+		},
+		ability = {extra={positiveodds=6,negativeodds=4}},
+		pos = { x = 4, y = 4 },
+        rarity=2,
+        cost = 8,
+        blueprint_compat=false,
+        eternal_compat=true,
+        effect=nil,
+        soul_pos=nil,
+        calculate = function(self,context)
+            if SMODS.end_calculate_context(context) then
+                if pseudorandom('blackcat') < G.GAME.probabilities.normal / self.ability.extra.positiveodds then
+                    trigger_goodkarma(self)
+                    for i= 1, #context.full_hand do
+                        local card=context.full_hand[i]
+                        if card.config.center == G.P_CENTERS.c_base then --if card is c_base/without enhancements
+                            local enhancement = G.P_CENTERS.m_lucky
+                            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('card1', 5);card:juice_up(0.3, 0.3);return true end }))
+                            G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.15,func = function() card:flip();play_sound('tarot1', 5);card:set_ability(enhancement);return true end }))
+                        end
+                    end
+                end
+                if pseudorandom('blackcat2') < G.GAME.probabilities.normal / self.ability.extra.negativeodds then
+                    trigger_badkarma(self)
+                    ease_dollars(-2)
+                end
+            end
+        end,
+        loc_def=function(self)
+            return {''..(G.GAME and G.GAME.probabilities.normal or 1),self.ability.extra.positiveodds,self.ability.extra.negativeodds}
+        end,    
+	},  
+    omenthirteen= {
+        name = "Omen - Thirteen",
+        text = {
+            "Gains {X:mult,C:white}X0.25{} Mult when {C:red}bad effects{} activate.", 
+            "{C:inactive}(Currently: {X:mult,C:white}X#4#{} {C:inactive}Mult)",                              
+            "{C:green}#1# in #2#{} chance {C:green}increase {C:red}Bad Karma{}.", 
+            "{C:red}#1# in #3#{} chance {C:red}decrease {C:green}Good Karma{}.",
+			"{C:inactive}(A lucky number?)"  
+		},
+		ability = {extra={positiveodds=6,negativeodds=4,x_mult=1}},
+		pos = { x = 3, y = 4 },
+        rarity=3,
+        cost = 12,
+        blueprint_compat=false,
+        eternal_compat=true,
+        effect=nil,
+        soul_pos=nil,
+        calculate = function(self,context)
+            if context.other_joker == self then 
+                if pseudorandom('thirteen') < G.GAME.probabilities.normal / self.ability.extra.positiveodds then
+                    trigger_goodkarma(self)
+                    mod_badkarma(-1)         
+                end       
+                if pseudorandom('thirteen') < G.GAME.probabilities.normal / self.ability.extra.negativeodds then
+                    trigger_badkarma(self)
+                    mod_goodkarma(1)   
+                end
+                return {
+                message = localize{type='variable',key='a_xmult',vars={self.ability.extra.x_mult}},
+                Xmult_mod = self.ability.extra.x_mult
+                }
+            end
+        end,
+        loc_def=function(self)
+            return {''..(G.GAME and G.GAME.probabilities.normal or 1),self.ability.extra.positiveodds,self.ability.extra.negativeodds,self.ability.extra.x_mult}
+        end,   
+        tooltip=function(self, info_queue)
+            info_queue[#info_queue+1] = { set = 'Other', key = 'karma' }
+        end   
+	},  
+    omenseven= {
+        name = "Omen - Seven",
+        text = {
+            "Gains {X:mult,C:white}X0.25X{} Mult when {C:green}good{} effects activate.",
+            "{C:inactive}(Currently: {X:mult,C:white}X#4#{} {C:inactive}Mult)",                            
+            "{C:green}#1# in #2#{} chance {C:green}increase Good Karma{}.", 
+            "{C:red}#1# in #3#{} chance {C:red}decrease {C:green}Good Karma{}.",
+			"{C:inactive}(A lucky number!)"  
+		},
+		ability = {extra={positiveodds=4,negativeodds=6,x_mult=1}},
+		pos = { x = 8, y = 4 },
+        rarity=3,
+        cost = 12,
+        blueprint_compat=false,
+        eternal_compat=true,
+        effect=nil,
+        soul_pos=nil,
+        calculate = function(self,context)
+            if context.other_joker == self then 
+                if pseudorandom('seven') < G.GAME.probabilities.normal / self.ability.extra.positiveodds then
+                    trigger_goodkarma(self)
+                    mod_goodkarma(-1)         
+                end       
+                if pseudorandom('seven') < G.GAME.probabilities.normal / self.ability.extra.negativeodds then
+                    trigger_badkarma(self)
+                    mod_goodkarma(1)   
+                end
+                return {
+                message = localize{type='variable',key='a_xmult',vars={self.ability.extra.x_mult}},
+                Xmult_mod = self.ability.extra.x_mult
+                }
+            end
+        end,
+        loc_def=function(self)
+            return {''..(G.GAME and G.GAME.probabilities.normal or 1),self.ability.extra.positiveodds,self.ability.extra.negativeodds,self.ability.extra.x_mult}
+        end,   
+        tooltip=function(self, info_queue)
+            info_queue[#info_queue+1] = { set = 'Other', key = 'karma' }
+        end   
+	},  
 }
 
 
@@ -1344,8 +1618,8 @@ local jokers = {
 function SMODS.INIT.ThemedJokers()
     ---localization texts:---
     --OMEN
-    G.localization.misc.dictionary.k_o_lucky = "Lucky!"
-    G.localization.misc.dictionary.k_o_unlucky = "Unlucky!"
+    G.localization.misc.dictionary.k_o_lucky = "Good Karma!"
+    G.localization.misc.dictionary.k_o_unlucky = "Bad Karma!"
     --COSMIC
     G.localization.misc.dictionary.k_c_upgrade = "Cosmic Upgrade!"
     G.localization.misc.dictionary.k_c_dollars = "Cosmic Money!"
@@ -1365,6 +1639,25 @@ function SMODS.INIT.ThemedJokers()
     
     
     ---localization tooltips:---
+    G.localization.descriptions.Other["karma"] = {
+        name = "Karma",
+        text = {
+            "{C:green}Good Karma{} increases",
+            "{C:green}good effect{} odds.",
+            "{C:red}Bad Karma{} increases",
+            "{C:red}bad effect{} odds."
+        }
+    }
+    
+    
+    G.localization.descriptions.Other["omen_blindsize"] = {
+        name = "Blind Size",
+        text = {
+            "Modifies {C:attention}Blind Size{} by {C:blue}20%{}.",
+            "Chooses randomly, if",
+            "both effects would trigger."
+        }
+    }
     G.localization.descriptions.Other["shatter"] = {
         name = "Shatter",
         text = {
@@ -1393,8 +1686,9 @@ function SMODS.INIT.ThemedJokers()
     G.localization.descriptions.Other["retrigger"] = {
         name = "Retrigger",
         text = {
-            "Per {C:green}100%{} chance",
-            "+1 guaranteed {C:attention}retrigger{}."
+            "At {C:green}100%+{} chance",
+            "+1 guaranteed {C:attention}retrigger{}.",
+            "{C:inactive}Capped at 120%"
         }
     }
     G.localization.descriptions.Other["seals"] = {
@@ -1454,11 +1748,7 @@ function SMODS.INIT.ThemedJokers()
     end
     --Create sprite atlas
     SMODS.Sprite:new("ThemedJokers", SMODS.findModByID("ThemedJokers").path, "ThemedJokers.png", 71, 95, "asset_atli"):register()
-end
-	
-	
-	
-	
+end	
 
 ----------------------------------------------
 ------------MOD CODE END----------------------
