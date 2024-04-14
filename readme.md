@@ -23,7 +23,7 @@ The Jokers get a boost for each other and can get strong if you get them early<b
 
 # Theme 4:(6/X WIP) **Omen**!<br>
 Collect Karma to influence the outcome of these chance based<br>
-Jokers. Some Jokers may benefit from you bad luck.<br>
+Jokers. Some Jokers may benefit from your bad luck.<br>
 
 You can preview the cards here:<br>
 [Themed Jokers](https://blizzowx.github.io/)
