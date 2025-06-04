@@ -465,7 +465,7 @@ local jokers = {
             context.other_card:get_id() ~= 14 then
                 local card=context.other_card
                 local suit_data = SMODS.Card.SUITS[card.base.suit]
-                local suit_prefix = suit_data.prefix .. '_'
+                local suit_prefix = suit_data.card_key .. '_'
                 local rank_suffix='A'			
                 shakecard(self) 
                 card:set_base(G.P_CARDS[suit_prefix..rank_suffix])
