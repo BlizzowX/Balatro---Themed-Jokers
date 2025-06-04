@@ -465,7 +465,7 @@ local jokers = {
             context.other_card:get_id() ~= 14 then
                 local card=context.other_card
                 local suit_data = SMODS.Card.SUITS[card.base.suit]
-                local suit_prefix = suit_data.prefix .. '_'
+                local suit_prefix = suit_data.card_key .. '_'
                 local rank_suffix='A'			
                 shakecard(self) 
                 card:set_base(G.P_CARDS[suit_prefix..rank_suffix])
@@ -1163,7 +1163,8 @@ local jokers = {
             end
 
             if context.setting_blind then
-                self.ability.extra.blindbuffer=G.GAME.blind.chips               
+                -- self.ability.extra.blindbuffer=G.GAME.blind.chips -- Old code
+                self.ability.extra.blindbuffer=get_blind_amount(G.GAME.round_resets.ante) * G.GAME.blind.mult * G.GAME.starting_params.ante_scaling
             end
 
             G.GAME.blind.chips=self.ability.extra.blindbuffer*(1-(self.ability.extra.decrease/100))
