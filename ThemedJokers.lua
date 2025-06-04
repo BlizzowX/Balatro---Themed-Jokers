@@ -1163,7 +1163,8 @@ local jokers = {
             end
 
             if context.setting_blind then
-                self.ability.extra.blindbuffer=G.GAME.blind.chips               
+                -- self.ability.extra.blindbuffer=G.GAME.blind.chips -- Old code
+                self.ability.extra.blindbuffer=get_blind_amount(G.GAME.round_resets.ante) * G.GAME.blind.mult * G.GAME.starting_params.ante_scaling
             end
 
             G.GAME.blind.chips=self.ability.extra.blindbuffer*(1-(self.ability.extra.decrease/100))
