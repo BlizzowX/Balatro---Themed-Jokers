@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Themed Joker Retriggered</title>
+  <script src="https://xemantic.github.io/shader-web-background/dist/shader-web-background.min.js"></script>
+  <script type="x-shader/x-fragment" id="image">
+    precision mediump float;
+    #define SPIN_EASE 0.2
+    #define spin_time 5.
+    #define spin_amount 0.5
+    #define contrast 5.
+
+    // default colours
+    #define colour_1 vec4(0.6392156863,0.3294117647,1.0,1.0)
+    #define colour_2 vec4(0.7960784314,0.0,1.0,1.0)
+    #define colour_3 vec4(0.2156862745,0.2588235294,0.2666666667,1.0)
+
+    uniform vec2 iResolution;
+    uniform float iTime;
+
+    void main( )
+    {
+      float pixel_size = 1.0;
+      vec2 uv = (floor(gl_FragCoord.xy*(1./pixel_size))*pixel_size - 0.5*iResolution.xy)/length(iResolution.xy) - vec2(0.12, 0.);
+      
+      float uv_len = length(uv);
+      
+      float speed = (spin_time*SPIN_EASE*0.2) + 302.2;
+      float new_pixel_angle = (atan(uv.y, uv.x)) + speed - SPIN_EASE*20.*(1.*spin_amount*uv_len + (1. - 1.*spin_amount));
+      
+      vec2 mid = vec2(0.5, 0.5);
+      uv = (vec2((uv_len * cos(new_pixel_angle) + mid.x), (uv_len * sin(new_pixel_angle) + mid.y)) - mid);
+      
+      uv *= 30.;
+      speed = iTime*(2.);
+      vec2 uv2 = vec2(uv.x+uv.y);
+
+      for(int i=0; i < 5; i++) {
+        uv2 += sin(max(uv.x, uv.y)) + uv;
+        uv  += 0.5*vec2(cos(5.1123314 + 0.353*uv2.y + speed*0.131121),sin(uv2.x - 0.113*speed));
+        uv  -= 1.0*cos(uv.x + uv.y) - 1.0*sin(uv.x*0.711 - uv.y);
+      }
+      
+      float contrast_mod = (0.25*contrast + 0.5*spin_amount + 1.2);
+      float paint_res =min(2., max(0.,length(uv)*(0.035)*contrast_mod));
+      float c1p = max(0.,1. - contrast_mod*abs(1.-paint_res));
+      float c2p = max(0.,1. - contrast_mod*abs(paint_res));
+      float c3p = 1. - min(1., c1p + c2p);
+
+      gl_FragColor = (0.3/contrast)*colour_1 + (1. - 0.3/contrast)*(colour_1*c1p + colour_2*c2p + vec4(c3p*colour_3.rgb, c3p*colour_1.a));
+    }
+  </script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <script>
+    let t = 0;
+    requestAnimationFrame(function update() {
+      t += 1/120;
+      requestAnimationFrame(update);
+    });
+    shaderWebBackground.shade({
+      shaders: {
+        image: {
+          uniforms: {
+            iResolution: (gl, loc, ctx) => gl.uniform2f(loc, ctx.width, ctx.height),
+            iTime: (gl, loc, ctx) => gl.uniform1f(loc, t)
+          }
+        }
+      }
+    });
+  </script>
+  <div class="bg">
+  </div>
+  <main>
+    <h1>Themed Joker Retriggered</h1>
+    
+    <a href="https://github.com/BlizzowX/Balatro---Themed-Jokers/releases/latest" id="download">Download on github</a>
+    <br>
+    <br>
+    <div class="theme-tabs">
+      <button class="tab-button active" data-theme="combat-aces">Combat Aces</button>
+      <button class="tab-button" data-theme="jurassic">Jurassic</button>
+      <button class="tab-button" data-theme="infected">Infected</button>
+      <button class="tab-button" data-theme="omen">Omen</button>
+    </div>
+    
+    <div class="theme-content active" id="combat-aces">
+      <div class="card-type-tabs">
+        <button class="card-type-button active" data-type="jokers">Jokers (7)</button>
+        <button class="card-type-button" data-type="blinds">Blinds (1)</button>
+        <button class="card-type-button" data-type="enhancements">Enhancements (0)</button>
+        <button class="card-type-button" data-type="consumables">Consumables (0)</button>
+      </div>
+      
+      <div class="card-type-content active" id="jokers">
+        <h2>Combat Ace Jokers: 7/7</h2>
+        <div class="jokers"></div>
+      </div>
+      
+      <div class="card-type-content" id="blinds">
+        <h2>Combat Ace Blinds: 1/1</h2>
+        <div class="blinds"></div>
+      </div>
+      
+      <div class="card-type-content" id="enhancements">
+        <h2>Combat Ace Enhancements: 0/0</h2>
+        <p>No enhancements available yet.</p>
+      </div>
+      
+      <div class="card-type-content" id="consumables">
+        <h2>Combat Ace Consumables: 0/0</h2>
+        <p>No consumables available yet.</p>
+      </div>
+    </div>
+    
+    <div class="theme-content" id="jurassic">
+      <div class="card-type-tabs">
+        <button class="card-type-button active" data-type="jokers">Jokers (12)</button>
+        <button class="card-type-button" data-type="blinds">Blinds (0)</button>
+        <button class="card-type-button" data-type="enhancements">Enhancements (0)</button>
+        <button class="card-type-button" data-type="consumables">Consumables (0)</button>
+      </div>
+      
+      <div class="card-type-content active" id="jokers">
+        <h2>Jurassic Jokers: 12/12</h2>
+        <div class="jokers"></div>
+      </div>
+      
+      <div class="card-type-content" id="blinds">
+        <h2>Jurassic Blinds: 0/0</h2>
+        <p>No blinds available yet.</p>
+      </div>
+      
+      <div class="card-type-content" id="enhancements">
+        <h2>Jurassic Enhancements: 0/0</h2>
+        <p>No enhancements available yet.</p>
+      </div>
+      
+      <div class="card-type-content" id="consumables">
+        <h2>Jurassic Consumables: 0/0</h2>
+        <p>No consumables available yet.</p>
+      </div>
+    </div>
+    
+    <div class="theme-content" id="infected">
+      <div class="card-type-tabs">
+        <button class="card-type-button active" data-type="jokers">Jokers (9)</button>
+        <button class="card-type-button" data-type="blinds">Blinds (0)</button>
+        <button class="card-type-button" data-type="enhancements">Enhancements (1)</button>
+        <button class="card-type-button" data-type="consumables">Consumables (0)</button>
+      </div>
+      
+      <div class="card-type-content active" id="jokers">
+        <h2>Infected Jokers: 9/9</h2>
+        <div class="jokers"></div>
+      </div>
+      
+      <div class="card-type-content" id="blinds">
+        <h2>Infected Blinds: 0/0</h2>
+        <p>No blinds available yet.</p>
+      </div>
+      
+      <div class="card-type-content" id="enhancements">
+        <h2>Infected Enhancements: 1/1</h2>
+        <div class="enhancements"></div>
+      </div>
+      
+      <div class="card-type-content" id="consumables">
+        <h2>Infected Consumables: 0/0</h2>
+        <p>No consumables available yet.</p>
+      </div>
+    </div>
+    
+    <div class="theme-content" id="omen">
+      <h2>Omen Jokers: Coming Soon</h2>
+      <br>
+      <p>Mystical omens are forming...</p>
+    </div>
+  </main>
+  
+  <footer>
+    <p>Original HTML Template by <a href="https://github.com/notmario/balatrowebsitetemplate" style="color: #4BC292; text-decoration: none;">notmario</a></p>
+  </footer>
+  
+  <script src="addjokers.js" defer></script>  
+</body>
+</html>

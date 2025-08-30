@@ -1,0 +1,16 @@
+{
+    "id": "ThemedJokersRetriggered",
+	"name":"Themed Jokers: Retriggered ",
+    "display_name": "TJ: Retriggered",
+    "author": ["Blizzow"],
+    "description": "Remade Version of my Themed Jokers mod.",
+    "prefix": "tjr",
+    "main_file": "main.lua",
+    "badge_colour": "7a13ad",
+	"badge_text_colour": "FFFFFF",
+    "dependencies": [
+        "Steamodded (>=1.0.0~BETA-0711a)",
+        "Lovely (>=0.7.1)"
+    ],
+    "version": "0.1.0"
+}
